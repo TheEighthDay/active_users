@@ -117,7 +117,7 @@ def o_data_2_csv_video_create_log():
 def load_data():
     """
 
-    :return: l, a, r, c
+    :return: r, l, c, a
     """
     app_launch_log = pd.DataFrame(pd.read_csv('../original_data/app_launch_log.csv', sep=' '))
     user_activity_log1 = pd.read_csv('../original_data/user_activity_log1.csv', sep=' ')
@@ -135,16 +135,16 @@ def load_data():
     user_register_log = pd.DataFrame(pd.read_csv('../original_data/user_register_log.csv', sep=' '))
     video_create_log = pd.DataFrame(pd.read_csv('../original_data/video_create_log.csv', sep=' '))
 
-    return app_launch_log, user_activity_log, user_register_log, video_create_log
+    return user_register_log, app_launch_log, video_create_log, user_activity_log
 
 
 if __name__ == '__main__':
-    # o_data_2_csv_app_launch_log()
-    # o_data_2_csv_user_activity_log()
-    # o_data_2_csv_user_register_log()
-    # o_data_2_csv_video_create_log()
+    o_data_2_csv_app_launch_log()
+    o_data_2_csv_user_activity_log()
+    o_data_2_csv_user_register_log()
+    o_data_2_csv_video_create_log()
 
-    l, a, r, c = load_data()
+    r, l, c, a = load_data()
     print(l.keys())
     print(a.keys())
     print(r.keys())
