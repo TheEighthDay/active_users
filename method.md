@@ -16,6 +16,7 @@
 |active_ratio|1|活跃比例：登陆天数 / register_time|
 |no_l_ratio|1|未登录时间比例：(当前时间 - 最后一次登录时间) / register_time|
 |l_last_ratio|1|持续活跃比例：连续登陆的天数 / register_time|
+|highfrequency_bool|1|规律登陆且周期小于等于七天：bool 上下两次登录时间差之差在二以内且登陆周期小于等于七天|
 |create_per_d|1|平均拍摄比例：拍摄次数 / register_time|
 |create_per_l|1|登陆拍摄比例：拍摄次数 / 登陆天数|
 |create_max|1|最大拍摄数
