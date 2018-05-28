@@ -271,6 +271,48 @@ def cnn():
     '''
 
 
+def xgb():
+    import xgboost as xgb
+
+    x, y = load_preprocessed_data_23_7()
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+
+    d_train = xgb.DMatrix(x_train, label=y_train)
+    d_test = xgb.DMatrix(x_test)
+
+    params = {'booster': 'gbtree',
+              'objective': 'binary:logistic',
+              'eval_metric': 'auc',
+              'max_depth': 4,
+              'lambda': 10,
+              'subsample': 0.75,
+              'colsample_bytree': 0.75,
+              'min_child_weight': 2,
+              'eta': 0.025,
+              'seed': 0,
+              'nthread': 8,
+              'silent': 1}
+
+    watchlist = [(d_train, 'train')]
+    bst = xgb.train(params, d_train, num_boost_round=300, evals=watchlist)
+
+    result = bst.predict(d_test)
+    print(result)
+    metrics(result, y_test)
+    ypred_contribs = bst.predict(d_test, pred_contribs=True)
+    for i in range(len(ypred_contribs[0])):
+        print(str(i) + ':' + str(ypred_contribs[0][i]))
+
+    '''
+    total:		 7490
+    Accuracy:	 0.8128170894526034
+    Precision:	 0.8276762402088773
+    Recall:		 0.7792952745151598
+    F1-score:	 0.8027574563871693
+    '''
+
+
 if __name__ == '__main__':
     # eval_model()
     # linear_r()
@@ -279,4 +321,5 @@ if __name__ == '__main__':
     # eval_ensemble_model()
     # gbr()
     # cnn()
-    ada()
+    # ada()
+    xgb()
