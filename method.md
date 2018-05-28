@@ -16,12 +16,12 @@
 |active_ratio|1|活跃比例：登陆天数 / register_time|
 |no_l_ratio|1|未登录时间比例：(当前时间 - 最后一次登录时间) / register_time|
 |l_last_ratio|1|持续活跃比例：连续登陆的天数 / register_time|
-|highfrequency_bool|1|规律登陆且周期小于等于七天：bool 上下两次登录时间差之差在二以内且登陆周期小于等于七天|
 |create_per_d|1|平均拍摄比例：拍摄次数 / register_time|
 |create_per_l|1|登陆拍摄比例：拍摄次数 / 登陆天数|
 |create_max|1|最大拍摄数
 |create_sd|1|拍摄数标准差：SD(注册后每天的拍摄数)|
 |create_last|1|持续拍摄比例：连续拍摄的天数 / register_time|
+|create_final|1|最后拍摄的时间|
 |action_per_d|1|平均行为比例：行为次数 / register_time|
 |action_per_l|1|登陆行为比例：行为次数 / 登陆天数|
 |action_max|1|最大行为数|
@@ -36,5 +36,3 @@
 |video_sd|1|SD(对每个视频所做行为的次数)|
 |author_num_ratio|1|作者数目比例：所有行为涉及的作者的个数 / 行为次数|
 |author_sd|1|SD(对每个作者的视频所做行为的次数)|
-|author_bool|1|(bool这个用户是作者（作者每天上线看自己视频情况高）)|
-|author_time|1|(最后发表作品时间)|
