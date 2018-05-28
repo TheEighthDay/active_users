@@ -49,7 +49,7 @@ def show_distribution():
     print(a.describe())
 
 
-def preprocessing_23_and_7():
+def preprocessing_23_7():
     r, l, c, a = load_data()
     # 将1到23天作为训练集
     x_l = l[l.day < 24]
@@ -57,6 +57,7 @@ def preprocessing_23_and_7():
     x_r = r[r.register_day < 24]
     x_c = c[c.day < 24]
     last_week_l_u = l[l.day >= 24]['user_id'].drop_duplicates().get_values()
+    author_id = list(a['author_id'].get_values())
 
     x, y = [], []
 
@@ -67,6 +68,7 @@ def preprocessing_23_and_7():
             x_l.loc[x_l.user_id == user_id].get_values(),
             x_c.loc[x_c.user_id == user_id].get_values(),
             x_a.loc[x_a.user_id == user_id].get_values(),
+            author_id,
             24)
 
         # 根据最后7天中用户是否登录app，来判断是否都活跃用户，
@@ -78,19 +80,62 @@ def preprocessing_23_and_7():
 
     x = np.array(x)
     y = np.array(y)
-    np.save('../original_data/x', x)
-    np.save('../original_data/y', y)
+    np.save('../original_data/x_23_7', x)
+    np.save('../original_data/y_23_7', y)
     print('x.shape:', x.shape)
     print('y.shape:', y.shape)
 
 
-def load_preprocessed_data():
-    x = np.load('../original_data/x.npy')
-    y = np.load('../original_data/y.npy')
-    return x, y
+def load_preprocessed_data_23_7():
+    x = np.load('../original_data/x_23_7.npy')
+    y = np.load('../original_data/y_23_7.npy')
+    return x, y.astype(np.float32)
+
+
+def preprocessing_24_6():
+    r, l, c, a = load_data()
+    # 将1到23天作为训练集
+    x_l = l[l.day < 25]
+    x_a = a[a.day < 25]
+    x_r = r[r.register_day < 25]
+    x_c = c[c.day < 25]
+    last_week_l_u = l[l.day >= 25]['user_id'].drop_duplicates().get_values()
+    author_id = list(a['author_id'].get_values())
+
+    x, y = [], []
+
+    for index in tqdm(x_r.index):
+        user_id = x_r.loc[index]['user_id']
+        v = vec(
+            x_r.loc[index].get_values(),
+            x_l.loc[x_l.user_id == user_id].get_values(),
+            x_c.loc[x_c.user_id == user_id].get_values(),
+            x_a.loc[x_a.user_id == user_id].get_values(),
+            author_id,
+            25)
+
+        # 根据最后7天中用户是否登录app，来判断是否都活跃用户，
+        # 仅凭判断user_id是否在launch_log中即可，不必判断另外两个log。
+        is_active = 1 if user_id in last_week_l_u else 0
+
+        x.append(v)
+        y.append(is_active)
+
+    x = np.array(x)
+    y = np.array(y)
+    np.save('../original_data/x_24_6', x)
+    np.save('../original_data/y_24_6', y)
+    print('x.shape:', x.shape)
+    print('y.shape:', y.shape)
+
+
+def load_preprocessed_data_24_6():
+    x = np.load('../original_data/x_24_6.npy')
+    y = np.load('../original_data/y_24_6.npy')
+    return x, y.astype(np.float32)
 
 
 if __name__ == '__main__':
-    preprocessing_23_and_7()
+    preprocessing_23_7()
     # show_distribution()
-    # load_preprocessed_data()
+    # load_preprocessed_data_23_7()

@@ -13,17 +13,24 @@ import numpy as np
 from active_users.util.load_data import load_data
 
 
-def vec(r: list, l: list, c: list, a: list, now):
+def vec(r: list, l: list, c: list, a: list, author_id: list, now):
     """
     输入一个用户对应的四个log中的数据，处理后返回特征向量
     :param r:
     :param l:
     :param c:
     :param a:
+    :param author_id: activity_log中所有author_id
     :param now: 当前时间（天），如用前23天作为训练集是，now应为24
     :return:
     """
-    # user_id = r[0]
+
+    # print(r)
+    # print(l)
+    # print(c)
+    # print(a)
+
+    user_id = r[0]
     register_day = r[1]
     register_type = r[2]
     device_type = r[3]
@@ -48,21 +55,30 @@ def vec(r: list, l: list, c: list, a: list, now):
     l_last_ratio = consecutive_days(launch_day_list) / register_time
     # print('l_last_ratio:', l_last_ratio)
 
-    create_list = [x[1] for x in c]
-    create_list.sort()
-    create_list_len = len(create_list)  # 拍摄次数
+    active_2_ratio = 0 if int(register_time / 2) == 0 else len([x[1] for x in l if x[1] > (
+        now - register_day - int(register_time / 2))]) / int(register_time / 2)
+    # print('active_2_ratio', active_2_ratio)
+    active_4_ratio = 0 if int(register_time / 4) == 0 else len([x[1] for x in l if x[1] > (
+        now - register_day - int(register_time / 4))]) / int(register_time / 4)
+    # print('active_4_ratio', active_4_ratio)
+    active_8_ratio = 0 if int(register_time / 8) == 0 else len([x[1] for x in l if x[1] > (
+        now - register_day - int(register_time / 8))]) / int(register_time / 8)
+    # print('active_8_ratio', active_8_ratio)
+
+    create_list = sorted([x[1] for x in c])
+    create_num = len(create_list)  # 拍摄次数
     # print('create_list_len:', create_list_len)
     create_day = list(set(create_list))  # 有哪些天进行了拍摄
     # print('create_day:', create_day)
-    create_per_d = create_list_len / register_time
+    create_per_d = create_num / register_time
     # print('create_per_d:', create_per_d)
 
-    create_per_l = create_list_len / launch_time
+    create_per_l = create_num / launch_time
     # print('create_per_l:', create_per_l)
 
     create_cnt_list = [create_list.count(x) for x in create_day]  # 每天拍摄的数目
     # print('create_cnt_list:', create_cnt_list)
-    create_max = 0 if create_list_len == 0 else max(create_cnt_list)
+    create_max = 0 if create_num == 0 else max(create_cnt_list)
     # print('create_max:', create_max)
 
     create_sd = 0 if len(create_day) <= 1 else np.std(create_cnt_list, ddof=1)
@@ -70,6 +86,11 @@ def vec(r: list, l: list, c: list, a: list, now):
 
     create_last = consecutive_days(list(create_day)) / register_time
     # print('create_last:', create_last)
+
+    create_final_day = register_day if create_num == 0 else max(create_day)
+    # print('create_final_day:', create_final_day)
+    create_final_ratio = (now - create_final_day) / register_time
+    # print('create_final_ratio:', create_final_ratio)
 
     action_list = [x[1] for x in a]
     action_list.sort()
@@ -135,6 +156,10 @@ def vec(r: list, l: list, c: list, a: list, now):
     author_sd = 0 if author_num <= 1 else np.std(author_cnt_list, ddof=1)
     # print('author_sd:', author_sd)
 
+    video_acted_avg = 0 if create_num == 0 else author_id.count(
+        user_id) / create_num
+    # print('video_acted_avg:', video_acted_avg)
+
     return np.array([
         register_time,
         register_type,
@@ -142,11 +167,16 @@ def vec(r: list, l: list, c: list, a: list, now):
         active_ratio,
         no_l_ratio,
         l_last_ratio,
+        active_2_ratio,
+        active_4_ratio,
+        active_8_ratio,
+        create_num,
         create_per_d,
         create_per_l,
         create_max,
         create_sd,
         create_last,
+        create_final_ratio,
         action_per_d,
         action_per_l,
         action_max,
@@ -158,7 +188,8 @@ def vec(r: list, l: list, c: list, a: list, now):
         video_num_ratio,
         video_sd,
         author_num_ratio,
-        author_sd
+        author_sd,
+        video_acted_avg
     ]
     )
 
@@ -186,17 +217,16 @@ def consecutive_days(l: list):
 
 
 if __name__ == '__main__':
-    test_user_index = 7
+    test_user_index = [1, 2, 3, 4, 5, 6, 7, 8]
     r, l, c, a = load_data()
-    r_temp = r.loc[test_user_index].get_values()
-    l_temp = l[l.user_id == r.loc[test_user_index]['user_id']].get_values()
-    c_temp = c[c.user_id == r.loc[test_user_index]['user_id']].get_values()
-    a_temp = a[a.user_id == r.loc[test_user_index]['user_id']].get_values()
-    # print(r_temp)
-    # print(l_temp)
-    # print(c_temp)
-    # print(a_temp)
+    result = []
+    author_id = list(a['author_id'].get_values())
+    for index in test_user_index:
+        r_temp = r.loc[index].get_values()
+        l_temp = l[l.user_id == r.loc[index]['user_id']].get_values()
+        c_temp = c[c.user_id == r.loc[index]['user_id']].get_values()
+        a_temp = a[a.user_id == r.loc[index]['user_id']].get_values()
 
-    result = vec(r_temp, l_temp, c_temp, a_temp, 24)
+        result.append(vec(r_temp, l_temp, c_temp, a_temp, author_id, 24))
 
-    print(result.shape)
+    print('result.shape:', result[0].shape)
