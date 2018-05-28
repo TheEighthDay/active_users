@@ -124,6 +124,25 @@ def eval_ensemble_model():
         print('%s: %f (%f)' % (key, cv_result.mean(), cv_result.std()))
 
 
+def ada():
+    x, y = load_preprocessed_data_23_7()
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+    model = Pipeline([('Scaler', StandardScaler()),
+                      ('SVM', AdaBoostRegressor(random_state=seed))])
+    model.fit(x_train, y_train)
+    result = model.predict(x_test)
+    metrics(result, y_test)
+
+    '''
+    total:		 7490
+    Accuracy:	 0.8012016021361815
+    Precision:	 0.8025069637883009
+    Recall:		 0.7869434580715652
+    F1-score:	 0.7946490139291132
+    '''
+
+
 def svr():
     x, y = load_preprocessed_data_23_7()
     x_train, x_test, y_train, y_test = train_test_split(
@@ -258,5 +277,6 @@ if __name__ == '__main__':
     # svr()
     # knn()
     # eval_ensemble_model()
-    gbr()
+    # gbr()
     # cnn()
+    ada()
