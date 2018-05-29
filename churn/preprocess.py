@@ -7,7 +7,8 @@
 # @Desc  :
 # @Contact : huiwenbin199822@gmail.com
 # @Software : PyCharm
-
+import sys
+sys.path.append("../../")
 from tqdm import tqdm
 import numpy as np
 from active_users.util.load_data import load_data
@@ -136,6 +137,7 @@ def load_preprocessed_data_24_6():
 
 
 if __name__ == '__main__':
-    preprocessing_23_7()
+    # preprocessing_23_7()
     # show_distribution()
-    # load_preprocessed_data_23_7()
+    X,y=load_preprocessed_data_23_7()
+    print(np.shape(y))
