@@ -17,11 +17,19 @@ from sklearn.linear_model import LogisticRegression, LinearRegression, Lasso, El
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
-from preprocess import load_preprocessed_data_23_7
+from active_users.churn.preprocess import load_preprocessed, load_preprocessed_data_23_7
 
 num_folds = 10
 seed = 7
 scoring = 'neg_mean_squared_error'
+windows = [
+    # [1, 4, 5, 5],
+    # [2, 10, 11, 12],
+    # [3, 15, 16, 18],
+    # [4, 20, 21, 24],
+    # [5, 25, 26, 30],
+    [1, 24, 25, 30]
+]
 
 
 def metrics(result, y, threshold=0.5):
@@ -49,9 +57,7 @@ def metrics(result, y, threshold=0.5):
     print('F1-score:\t', f1_score)
 
 
-def eval_model():
-    x, y = load_preprocessed_data_23_7()
-
+def eval_model(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
 
@@ -84,9 +90,7 @@ def eval_model():
         print('%s: %f (%f)' % (key, cv_result.mean(), cv_result.std()))
 
 
-def eval_ensemble_model():
-    x, y = load_preprocessed_data_23_7()
-
+def eval_ensemble_model(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
 
@@ -124,8 +128,7 @@ def eval_ensemble_model():
         print('%s: %f (%f)' % (key, cv_result.mean(), cv_result.std()))
 
 
-def ada():
-    x, y = load_preprocessed_data_23_7()
+def ada(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
     model = Pipeline([('Scaler', StandardScaler()),
@@ -143,8 +146,7 @@ def ada():
     '''
 
 
-def svr():
-    x, y = load_preprocessed_data_23_7()
+def svr(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
     model = Pipeline([('Scaler', StandardScaler()),
@@ -162,8 +164,7 @@ def svr():
     '''
 
 
-def linear_r():
-    x, y = load_preprocessed_data_23_7()
+def linear_r(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
     model = Pipeline([('Scaler', StandardScaler()),
@@ -181,8 +182,7 @@ def linear_r():
     '''
 
 
-def knn():
-    x, y = load_preprocessed_data_23_7()
+def knn(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
     model = Pipeline([('Scaler', StandardScaler()),
@@ -202,7 +202,6 @@ def knn():
 
 
 def gbr():
-    x, y = load_preprocessed_data_23_7()
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
     model = Pipeline([('Scaler', StandardScaler()),
@@ -221,15 +220,15 @@ def gbr():
     '''
 
 
-def cnn():
+def cnn(x, y):
+    from keras.callbacks import ModelCheckpoint
     from keras.preprocessing.sequence import pad_sequences
     from keras.wrappers.scikit_learn import KerasRegressor
     from keras.models import Sequential
     from keras.layers import Dropout, Dense, Activation, Conv2D, MaxPooling2D, Flatten, Conv1D, MaxPooling1D, \
         GlobalAveragePooling1D, BatchNormalization
-    x, y = load_preprocessed_data_23_7()
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.2, random_state=seed)
+        x, y, test_size=0.2, random_state=seed, shuffle=True)
     scaler = StandardScaler()
     scaler.fit(x)
     x_train = scaler.transform(x_train)
@@ -254,13 +253,18 @@ def cnn():
     model.add(Dense(256, activation='relu'))
     model.add(Dropout(0.5))
 
+    model.add(Dense(256, activation='relu'))
+    model.add(Dropout(0.5))
+
     model.add(Dense(1, activation='sigmoid'))
 
-    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    print('begin')
-    model.fit(x_train, y_train, batch_size=30, epochs=10, validation_split=0.2, shuffle=True)
-    result = model.predict(x_test)
-    metrics(result, y_test)
+    model.compile(optimizer='sgd', loss='binary_crossentropy', metrics=['accuracy'])
+
+    model_checkpoint = ModelCheckpoint(
+        '../model/530cnn.model', monitor='val_loss', save_best_only=True)
+
+    model.fit(x_train, y_train, batch_size=30, epochs=30, validation_split=0.2, shuffle=True, callbacks=[model_checkpoint])
+
 
     '''
     total:		 7490
@@ -271,12 +275,28 @@ def cnn():
     '''
 
 
-def xgb():
+def cnn_metrics(x, y):
+    from keras.models import load_model
+
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed, shuffle=True)
+    scaler = StandardScaler()
+    scaler.fit(x)
+    x_train = scaler.transform(x_train)
+    x_test = scaler.transform(x_test)
+    x_train = x_train.reshape(x_train.shape[0], 7, 7, 1)
+    x_test = x_test.reshape(x_test.shape[0], 7, 7, 1)
+
+    model = load_model('../model/530cnn.model')
+    result = model.predict(x_test)
+    metrics(result, y_test)
+
+
+def xgb(x, y):
     import xgboost as xgb
     from xgboost import plot_importance
     import matplotlib.pyplot as plt
 
-    x, y = load_preprocessed_data_23_7()
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
 
@@ -301,7 +321,7 @@ def xgb():
     bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
-    bst.save_model('../model/529xgb.model')
+    bst.save_model('../model/530xgb.model')
     print(result)
     print(y_test)
     metrics(result, y_test)
@@ -312,21 +332,25 @@ def xgb():
     plt.show()
 
     '''
-    total:		 7490
-    Accuracy:	 0.8128170894526034
-    Precision:	 0.8276762402088773
-    Recall:		 0.7792952745151598
-    F1-score:	 0.8027574563871693
+    params={'max_depth':5, 'eta':0.01, 'silent':0, 'objective':'binary:logistic', 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
+    total:		 8104
+    Accuracy:	 0.8257650542941757
+    Precision:	 0.8277227722772277
+    Recall:		 0.7846607669616519
+    F1-score:	 0.8056167400881057
     '''
 
 
 if __name__ == '__main__':
-    # eval_model()
-    # linear_r()
-    # svr()
-    # knn()
-    # eval_ensemble_model()
-    # gbr()
-    # cnn()
-    # ada()
-    xgb()
+    # x, y = load_preprocessed_data_23_7()
+    x, y = load_preprocessed(windows)
+    # eval_model(x, y)
+    # linear_r(x, y)
+    # svr(x, y)
+    # knn(x, y)
+    # eval_ensemble_model(x, y)
+    # gbr(x, y)
+    # cnn(x, y)
+    # cnn_metrics(x, y)
+    # ada(x, y)
+    xgb(x, y)
