@@ -17,7 +17,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression, Lasso, El
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
-from active_users.churn.preprocess import load_preprocessed_data_23_7
+from preprocess import load_preprocessed_data_23_7
 
 num_folds = 10
 seed = 7
@@ -273,6 +273,8 @@ def cnn():
 
 def xgb():
     import xgboost as xgb
+    from xgboost import plot_importance
+    import matplotlib.pyplot as plt
 
     x, y = load_preprocessed_data_23_7()
     x_train, x_test, y_train, y_test = train_test_split(
@@ -281,28 +283,33 @@ def xgb():
     d_train = xgb.DMatrix(x_train, label=y_train)
     d_test = xgb.DMatrix(x_test)
 
-    params = {'booster': 'gbtree',
-              'objective': 'binary:logistic',
-              'eval_metric': 'auc',
-              'max_depth': 4,
-              'lambda': 10,
-              'subsample': 0.75,
-              'colsample_bytree': 0.75,
-              'min_child_weight': 2,
-              'eta': 0.025,
-              'seed': 0,
-              'nthread': 8,
-              'silent': 1}
+    # params = {'booster': 'gbtree',
+    #           'objective': 'binary:logistic',
+    #           'eval_metric': 'auc',
+    #           'max_depth': 6,
+    #           'lambda': 10,
+    #           'subsample': 0.75,
+    #           'colsample_bytree': 0.75,
+    #           'min_child_weight': 4,
+    #           'eta': 0.025,
+    #           'seed': 0,
+    #           'nthread': 8,
+    #           'silent': 1}
+    params={'max_depth':5, 'eta':0.01, 'silent':0, 'objective':'binary:logistic', 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
 
     watchlist = [(d_train, 'train')]
-    bst = xgb.train(params, d_train, num_boost_round=300, evals=watchlist)
+    bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
+    bst.save_model('../model/529xgb.model')
     print(result)
+    print(y_test)
     metrics(result, y_test)
-    ypred_contribs = bst.predict(d_test, pred_contribs=True)
-    for i in range(len(ypred_contribs[0])):
-        print(str(i) + ':' + str(ypred_contribs[0][i]))
+    # ypred_contribs = bst.predict(d_test, pred_contribs=True)
+    # for i in range(len(ypred_contribs[0])):
+    #     print(str(i) + ':' + str(ypred_contribs[0][i]))
+    plot_importance(bst)
+    plt.show()
 
     '''
     total:		 7490
