@@ -49,6 +49,10 @@ def show_distribution():
     print(a.describe())
 
 
+def preprocessing_sliding(feature_window_begin, feature_window_end, label_window_begin, label_window_end)
+    pass
+
+
 def preprocessing_23_7():
     r, l, c, a = load_data()
     # 将1到23天作为训练集
