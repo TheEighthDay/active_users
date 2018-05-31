@@ -11,8 +11,8 @@ import sys
 sys.path.append("../../")
 from tqdm import tqdm
 import numpy as np
-from active_users.util.load_data import load_data
-from active_users.util.vectorizer import vec
+from util.load_data import load_data
+from util.vectorizer import vec
 
 
 def show_distribution():

@@ -13,8 +13,9 @@ import time
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from active_users.util.vectorizer import vec
-from active_users.util.load_data import load_data
+from util.vectorizer import vec
+from util.load_data import load_data
+
 
 
 def gen_vec_data():
@@ -75,4 +76,4 @@ def xgb_predict(fn):
 
 
 if __name__ == '__main__':
-    xgb_predict('../model/530xgb.model')
+    xgb_predict('../model/531xgb2.model')

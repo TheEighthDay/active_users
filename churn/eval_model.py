@@ -17,7 +17,8 @@ from sklearn.linear_model import LogisticRegression, LinearRegression, Lasso, El
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
-from active_users.churn.preprocess import load_preprocessed, load_preprocessed_data_23_7
+from sklearn.grid_search import GridSearchCV
+from preprocess import load_preprocessed, load_preprocessed_data_23_7
 
 num_folds = 10
 seed = 7
@@ -315,13 +316,15 @@ def xgb(x, y):
     #           'seed': 0,
     #           'nthread': 8,
     #           'silent': 1}
-    params={'max_depth':5, 'eta':0.01, 'silent':0, 'objective':'binary:logistic', 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
 
+    #params={'max_depth':4, 'min_child_weight':6,'eta':0.01, 'silent':0, 'objective':'binary:logistic','subsample':1.0, 'colsample_bytree':1.0, 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
+
+    params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
     watchlist = [(d_train, 'train')]
     bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
-    bst.save_model('../model/530xgb.model')
+    bst.save_model('../model/531xgb2.model')
     print(result)
     print(y_test)
     metrics(result, y_test)
@@ -331,6 +334,7 @@ def xgb(x, y):
     plot_importance(bst)
     plt.show()
 
+
     '''
     params={'max_depth':5, 'eta':0.01, 'silent':0, 'objective':'binary:logistic', 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
     total:		 8104
@@ -339,6 +343,48 @@ def xgb(x, y):
     Recall:		 0.7846607669616519
     F1-score:	 0.8056167400881057
     '''
+    '''
+    params={'max_depth':4, 'min_child_weight':6,'eta':0.01, 'silent':0, 'objective':'binary:logistic', 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
+    total:		 8104
+    Accuracy:	 0.8256416584402764
+    Precision:	 0.8256467941507312
+    Recall:		 0.7873424510592653
+    F1-score:	 0.8060398078242965
+    time: 5_31_12_30
+    '''
+
+def xgb_gridsearch(x, y):
+    import xgboost as xgb
+    from xgboost.sklearn import XGBClassifier
+    from sklearn.grid_search import GridSearchCV
+    import numpy as np
+
+    y = np.squeeze(y)
+    x = np.squeeze(x)
+
+    param_test4 = {
+        'subsample': [i / 10.0 for i in range(6, 9)],
+        'colsample_bytree': [i / 10.0 for i in range(6, 9)]
+    }
+    #param_test6 = {
+    #    'reg_alpha': [1e-5, 1e-2, 0.1, 1, 100]
+    #}    正则优化（暂无必要）
+
+    gsearch1 = GridSearchCV(estimator=XGBClassifier(learning_rate=0.1, max_depth=4,
+                                                    min_child_weight=6, gamma=0, subsample=1.0, colsample_bytree=1.0,
+                                                    objective='binary:logistic'),
+                            param_grid=param_test4, scoring='f1', n_jobs=4, iid=False, cv=5)
+    gsearch1.fit(x, y)
+
+    print("Best parameters set found on development set:")
+    print(gsearch1.best_params_)
+
+    '''Best parameters set found on development set:
+{'max_depth': 4, 'min_child_weight': 4}
+{'gamma': 0.0}
+{'colsample_bytree': 0.7, 'subsample': 0.6}'''
+
+
 
 
 if __name__ == '__main__':
@@ -354,3 +400,4 @@ if __name__ == '__main__':
     # cnn_metrics(x, y)
     # ada(x, y)
     xgb(x, y)
+    #xgb_gridsearch(x, y)
