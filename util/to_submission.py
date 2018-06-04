@@ -83,4 +83,4 @@ def lgb_predict(fn):
 
 if __name__ == '__main__':
     #xgb_predict('../model/604xgb.model')
-    lgb_predict('../model/604lgb.model')
+    lgb_predict('../model/604lgb_after_gs.model')

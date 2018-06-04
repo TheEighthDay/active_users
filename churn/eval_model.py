@@ -419,20 +419,28 @@ def lgb_gridsearch(x, y):
     x = np.squeeze(x)
     y = np.squeeze(y)
     param_test = {
-        'max_depth': [5,7,9,11,13,15],
-        'num_leaves': [10,15,20,25,30,35,40],
+
     }
     estimator = LGBMClassifier(
-        num_leaves=50,  # cv调节50是最优值
-        max_depth=13,
+        num_leaves=4,
+        max_depth=2,
         learning_rate=0.1,
-        n_estimators=1000,
+        n_estimators=185,
         objective= 'binary',
-        min_child_weight=1,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        nthread=7,
+        min_child_weight=5,
+        nthread=4,
+        colsample_bytree = 0.6,
+        subsample = 0.7,
     )
+    '''
+    6_4
+    Best score: 0.801
+Best parameters set:
+	colsample_bytree: 0.6
+	num_leaves: 4
+	subsample: 0.7
+	min_child_weight: 5
+	n_estimators: 185'''
     gsearch = GridSearchCV(estimator, param_grid=param_test, scoring='f1', cv=5)
     gsearch.fit(x, y)
     print(gsearch.grid_scores_, gsearch.best_params_, gsearch.best_score_)
@@ -443,25 +451,22 @@ def lgb(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
 
-    param_test = {
-        'max_depth': [5,7,9,11,13,15],
-        'num_leaves': [10,15,20,25,30,35,40],
-    }
     bst = LGBMClassifier(
-        num_leaves=10,  # cv调节50是最优值
-        max_depth=5,
+        num_leaves=4,
+        max_depth=2,
         learning_rate=0.01,
-        n_estimators=1000,
+        n_estimators=185,
         objective='binary',
-        min_child_weight=1,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        nthread=7,
+        min_child_weight=5,
+        nthread=4,
+        colsample_bytree=0.6,
+        subsample=0.7,
     )
     bst.fit(x_train,y_train)
     result = bst.predict(x_test)
     from sklearn.externals import joblib
-    joblib.dump(bst,'../model/604lgb.model')
+    joblib.dump(bst,'../model/604lgb_after_gs.model')
+    metrics(result,y_test)
     print(result)
     print(y_test)
 
@@ -481,4 +486,4 @@ if __name__ == '__main__':
     # xgb(x, y)
     lgb(x, y)
     #lgb_gridsearch(x, y)
-    # xgb_gridsearch(x, y)
+    #xgb_gridsearch(x, y)
