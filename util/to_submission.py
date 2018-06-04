@@ -58,7 +58,7 @@ def to_submission(model_name: str, model, x, ids):
     result = model.predict(x)
     ending = []
     for i in range(len(result)):
-        if result[i] >= 0.5:
+        if result[i] >= 0.4:
             ending.append(ids[i])
 
     timestamp = str(time.strftime('_%m_%d_%H_%M', time.localtime()))
@@ -73,7 +73,14 @@ def xgb_predict(fn):
     x, ids = gen_vec_data()
     x = xgb.DMatrix(x)
     to_submission('xgb', bst, x, ids)
+def lgb_predict(fn):
+    from lightgbm.sklearn import LGBMClassifier
+    from sklearn.externals import joblib
+    bst = joblib.load(fn)
+    x, ids = gen_vec_data()
+    to_submission('lgb', bst, x, ids)
 
 
 if __name__ == '__main__':
-    xgb_predict('../model/531xgb2.model')
+    #xgb_predict('../model/604xgb.model')
+    lgb_predict('../model/604lgb.model')

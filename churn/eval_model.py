@@ -17,8 +17,23 @@ from sklearn.linear_model import LogisticRegression, LinearRegression, Lasso, El
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
+from sklearn import metrics
 from sklearn.grid_search import GridSearchCV
 from preprocess import load_preprocessed, load_preprocessed_data_23_7
+import scipy as sp
+import copy, os, sys, psutil
+import lightgbm as lgb
+from lightgbm.sklearn import LGBMClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.datasets import dump_svmlight_file
+import numpy as np
+import  pandas as pd
+
+
+from sklearn import metrics  # Additional scklearn functions
+from sklearn.grid_search import GridSearchCV  # Perforing grid search
+
+
 
 num_folds = 10
 seed = 7
@@ -298,8 +313,8 @@ def xgb(x, y):
     from xgboost import plot_importance
     import matplotlib.pyplot as plt
 
-    x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=0.2, random_state=seed)
+
+
 
     d_train = xgb.DMatrix(x_train, label=y_train)
     d_test = xgb.DMatrix(x_test)
@@ -316,15 +331,16 @@ def xgb(x, y):
     #           'seed': 0,
     #           'nthread': 8,
     #           'silent': 1}
-
+    params = {'max_depth': 4, 'min_child_weight': 6, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic',
+              'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     #params={'max_depth':4, 'min_child_weight':6,'eta':0.01, 'silent':0, 'objective':'binary:logistic','subsample':1.0, 'colsample_bytree':1.0, 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
     # 31号晚params={'max_depth':4, 'eta':0.015, 'silent':0, 'objective':'binary:logistic', 'lambda': 4, 'alpha':0.5, 'eval_metric':'auc'}
-    params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
+    #params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
     watchlist = [(d_train, 'train')]
     bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
-    bst.save_model('../model/531xgb2.model')
+    bst.save_model('../model/604xgb.model')
     print(result)
     print(y_test)
     metrics(result, y_test)
@@ -385,6 +401,69 @@ def xgb_gridsearch(x, y):
 {'colsample_bytree': 0.7, 'subsample': 0.6}'''
 
 
+def print_best_score(gsearch, param_test):
+    # 输出best score
+    print("Best score: %0.3f" % gsearch.best_score_)
+    print("Best parameters set:")
+    # 输出最佳的分类器到底使用了怎样的参数
+    best_parameters = gsearch.best_estimator_.get_params()
+    for param_name in sorted(param_test.keys()):
+        print("\t%s: %r" % (param_name, best_parameters[param_name]))
+
+
+def lgb_gridsearch(x, y):
+
+
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+    x = np.squeeze(x)
+    y = np.squeeze(y)
+    param_test = {
+        'max_depth': [5,7,9,11,13,15],
+        'num_leaves': [10,15,20,25,30,35,40],
+    }
+    estimator = LGBMClassifier(
+        num_leaves=50,  # cv调节50是最优值
+        max_depth=13,
+        learning_rate=0.1,
+        n_estimators=1000,
+        objective= 'binary',
+        min_child_weight=1,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        nthread=7,
+    )
+    gsearch = GridSearchCV(estimator, param_grid=param_test, scoring='f1', cv=5)
+    gsearch.fit(x, y)
+    print(gsearch.grid_scores_, gsearch.best_params_, gsearch.best_score_)
+    print_best_score(gsearch, param_test)
+
+def lgb(x, y):
+
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+
+    param_test = {
+        'max_depth': [5,7,9,11,13,15],
+        'num_leaves': [10,15,20,25,30,35,40],
+    }
+    bst = LGBMClassifier(
+        num_leaves=10,  # cv调节50是最优值
+        max_depth=5,
+        learning_rate=0.01,
+        n_estimators=1000,
+        objective='binary',
+        min_child_weight=1,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        nthread=7,
+    )
+    bst.fit(x_train,y_train)
+    result = bst.predict(x_test)
+    from sklearn.externals import joblib
+    joblib.dump(bst,'../model/604lgb.model')
+    print(result)
+    print(y_test)
 
 
 if __name__ == '__main__':
@@ -399,5 +478,7 @@ if __name__ == '__main__':
     # cnn(x, y)
     # cnn_metrics(x, y)
     # ada(x, y)
-    xgb(x, y)
-    #xgb_gridsearch(x, y)
+    # xgb(x, y)
+    lgb(x, y)
+    #lgb_gridsearch(x, y)
+    # xgb_gridsearch(x, y)
