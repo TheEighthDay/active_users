@@ -7,7 +7,8 @@
 # @Desc  :
 # @Contact : huiwenbin199822@gmail.com
 # @Software : PyCharm
-
+import sys
+sys.path.append('../')
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor, ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
@@ -22,8 +23,8 @@ from sklearn.grid_search import GridSearchCV
 from preprocess import load_preprocessed, load_preprocessed_data_23_7
 import scipy as sp
 import copy, os, sys, psutil
-import lightgbm as lgb
-from lightgbm.sklearn import LGBMClassifier
+# import lightgbm as lgb
+# from lightgbm.sklearn import LGBMClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import dump_svmlight_file
 import numpy as np
@@ -48,7 +49,7 @@ windows = [
 ]
 
 
-def metrics(result, y, threshold=0.5):
+def metrics(result, y, threshold=0.45):
     tp, tn, fp, fn = 0, 0, 0, 0
     for i in range(len(result)):
         if result[i] > threshold:
@@ -313,7 +314,8 @@ def xgb(x, y):
     from xgboost import plot_importance
     import matplotlib.pyplot as plt
 
-
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
 
 
     d_train = xgb.DMatrix(x_train, label=y_train)
@@ -331,16 +333,18 @@ def xgb(x, y):
     #           'seed': 0,
     #           'nthread': 8,
     #           'silent': 1}
-    params = {'max_depth': 4, 'min_child_weight': 6, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic',
+    params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic',
               'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     #params={'max_depth':4, 'min_child_weight':6,'eta':0.01, 'silent':0, 'objective':'binary:logistic','subsample':1.0, 'colsample_bytree':1.0, 'lambda': 3, 'alpha':0.2, 'eval_metric':'auc'}
     # 31号晚params={'max_depth':4, 'eta':0.015, 'silent':0, 'objective':'binary:logistic', 'lambda': 4, 'alpha':0.5, 'eval_metric':'auc'}
     #params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
+    #5号params = {'max_depth': 6, 'min_child_weight': 6, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic',
+    #          'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     watchlist = [(d_train, 'train')]
     bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
-    bst.save_model('../model/604xgb.model')
+    bst.save_model('../model/605xgb.model')
     print(result)
     print(y_test)
     metrics(result, y_test)
@@ -483,7 +487,7 @@ if __name__ == '__main__':
     # cnn(x, y)
     # cnn_metrics(x, y)
     # ada(x, y)
-    # xgb(x, y)
-    lgb(x, y)
+    xgb(x, y)
+    # lgb(x, y)
     #lgb_gridsearch(x, y)
     #xgb_gridsearch(x, y)

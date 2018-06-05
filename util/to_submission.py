@@ -7,7 +7,8 @@
 # @Desc  : 
 # @Contact : huiwenbin199822@gmail.com 
 # @Software : PyCharm
-
+import sys
+sys.path.append("../")
 import os
 import time
 import numpy as np
@@ -73,14 +74,14 @@ def xgb_predict(fn):
     x, ids = gen_vec_data()
     x = xgb.DMatrix(x)
     to_submission('xgb', bst, x, ids)
-def lgb_predict(fn):
-    from lightgbm.sklearn import LGBMClassifier
-    from sklearn.externals import joblib
-    bst = joblib.load(fn)
-    x, ids = gen_vec_data()
-    to_submission('lgb', bst, x, ids)
+# def lgb_predict(fn):
+#     from lightgbm.sklearn import LGBMClassifier
+#     from sklearn.externals import joblib
+#     bst = joblib.load(fn)
+#     x, ids = gen_vec_data()
+#     to_submission('lgb', bst, x, ids)
 
 
 if __name__ == '__main__':
     #xgb_predict('../model/604xgb.model')
-    lgb_predict('../model/604lgb_after_gs.model')
+    xgb_predict('../model/605xgb.model')
