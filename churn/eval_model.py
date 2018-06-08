@@ -339,7 +339,7 @@ def xgb(x, y):
     # 31号晚params={'max_depth':4, 'eta':0.015, 'silent':0, 'objective':'binary:logistic', 'lambda': 4, 'alpha':0.5, 'eval_metric':'auc'}
     #params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
     #5号晚0.4 params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.015, 'silent': 0, 'objective': 'binary:logistic',
-             'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
+    #         'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic',
              'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     watchlist = [(d_train, 'train')]
