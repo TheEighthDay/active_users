@@ -2,13 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="912ff8d4-8491-4968-9254-0bbc90c32744" name="默认的" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/model/605lgb.model" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/result/lgb_06_05_21_15.csv" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/churn/eval_model.py" afterPath="$PROJECT_DIR$/churn/eval_model.py" />
-      <change beforePath="$PROJECT_DIR$/model/530xgb当前base最佳参数.model" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/model/604lgb.model" afterPath="$PROJECT_DIR$/model/604lgb_80.9.model" />
-      <change beforePath="$PROJECT_DIR$/util/to_submission.py" afterPath="$PROJECT_DIR$/util/to_submission.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/model/603xgb.model" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/model/605_night_xgb.model" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/model/605xgb.model" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/result/xgb_06_03_21_47.csv" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/result/xgb_06_05_11_56.csv" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/result/xgb_06_05_22_56.csv" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -22,11 +21,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="eval_model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="eval_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/churn/eval_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-906">
-              <caret line="568" column="52" lean-forward="false" selection-start-line="568" selection-start-column="34" selection-end-line="568" selection-end-column="54" />
+            <state relative-caret-position="804">
+              <caret line="592" column="1" lean-forward="false" selection-start-line="592" selection-start-column="1" selection-end-line="592" selection-end-column="1" />
               <folding>
                 <element signature="e#188#305#0" expanded="true" />
               </folding>
@@ -54,7 +53,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="to_submission.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="to_submission.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/util/to_submission.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="222">
@@ -304,6 +303,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924694" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924694" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="消息" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24962631" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32924694" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="运行" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35901925" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -711,22 +711,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/churn/eval_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="804">
+          <caret line="592" column="1" lean-forward="false" selection-start-line="592" selection-start-column="1" selection-end-line="592" selection-end-column="1" />
+          <folding>
+            <element signature="e#188#305#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/util/to_submission.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="222">
           <caret line="93" column="9" lean-forward="false" selection-start-line="93" selection-start-column="9" selection-end-line="93" selection-end-column="9" />
           <folding>
             <element signature="e#193#202#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/churn/eval_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-906">
-          <caret line="568" column="52" lean-forward="false" selection-start-line="568" selection-start-column="34" selection-end-line="568" selection-end-column="54" />
-          <folding>
-            <element signature="e#188#305#0" expanded="true" />
           </folding>
         </state>
       </provider>
