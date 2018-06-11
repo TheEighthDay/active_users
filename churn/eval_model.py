@@ -313,7 +313,8 @@ def xgb(x, y):
     from xgboost import plot_importance
     import matplotlib.pyplot as plt
 
-
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed, shuffle=True)
 
 
     d_train = xgb.DMatrix(x_train, label=y_train)
@@ -451,7 +452,7 @@ def lgb(x, y):
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.2, random_state=seed)
 
-    bst = LGBMClassifier(
+    '''bst = LGBMClassifier(
         num_leaves=4,
         max_depth=2,
         learning_rate=0.01,
@@ -459,16 +460,128 @@ def lgb(x, y):
         objective='binary',
         min_child_weight=5,
         nthread=4,
-        colsample_bytree=0.6,
+        colsample_bytree=0.6,eval_model
         subsample=0.7,
-    )
+    )'''
+    bst = LGBMClassifier()
     bst.fit(x_train,y_train)
     result = bst.predict(x_test)
     from sklearn.externals import joblib
-    joblib.dump(bst,'../model/604lgb_after_gs.model')
+    joblib.dump(bst,'../model/605lgb.model')
     metrics(result,y_test)
     print(result)
     print(y_test)
+
+def svc_gridsearch(x, y):
+
+    from sklearn.svm import SVC
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+    x = np.squeeze(x)
+    y = np.squeeze(y)
+    param_test = {"C": [0.1, 1, 10], "gamma": [0.1, 0.2, 0.3]}
+    estimator = SVC()
+    gsearch = GridSearchCV(estimator, param_grid=param_test, scoring='f1', cv=5)
+    gsearch.fit(x, y)
+    print(gsearch.grid_scores_, gsearch.best_params_, gsearch.best_score_)
+    print_best_score(gsearch, param_test)
+    ''' 
+    Best
+    score: 0.705
+    Best
+    parameters
+    set:
+    C: 10
+    gamma: 0.1'''
+def rf_gridsearch(x, y):
+
+    from sklearn.ensemble import RandomForestClassifier
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+    x = np.squeeze(x)
+    y = np.squeeze(y)
+    param_test = {'n_estimators'[10,50,90]}
+    #param_test = {'max_depth': range(1, 5), 'min_samples_split': range(2, 10), 'min_samples_leaf': range(40, 60, 2)}
+
+    estimator = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=None, max_features='auto', max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            n_estimators=10, n_jobs=1, oob_score=True, random_state=10,
+            verbose=0, warm_start=False)
+    gsearch = GridSearchCV(estimator, param_grid=param_test, scoring='f1', cv=5)
+    gsearch.fit(x, y)
+    print(gsearch.grid_scores_, gsearch.best_params_, gsearch.best_score_)
+    print_best_score(gsearch, param_test)
+
+def vote(x, y):
+    from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+    from sklearn.externals import joblib
+    import xgboost as xgb
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.2, random_state=seed)
+    d_train = xgb.DMatrix(x_train, label=y_train)
+    d_test = xgb.DMatrix(x_test)
+
+
+    bst1 = xgb.Booster()  # init model
+    bst1.load_model('../model/530xgbbest.model')  # load data
+    bst2 = xgb.Booster()  # init model
+    bst2.load_model('../model/531xgb_20_18.model')  # load data
+    bst3 = xgb.Booster()  # init model
+    bst3.load_model('../model/529xgb.model')  # load data
+
+    model1 = bst1
+    model2 = bst2
+    model3 = bst3
+    eclf = VotingClassifier(estimators=[('1', bst1), ('2', bst2), ('3', bst3)], voting='hard',weights=[2,2,1])
+    eclf.fit(x_train,y_train)
+    result = eclf.predict(x_test)
+    from sklearn.externals import joblib
+    joblib.dump(eclf,'../model/611vote1.model')
+    metrics(result,y_test)
+    print(result)
+    print(y_test)
+
+def vote2(x, y):
+     import numpy as np
+     from sklearn.linear_model import LogisticRegression
+     from sklearn.naive_bayes import GaussianNB
+     from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+     from xgboost.sklearn import XGBClassifier
+     from sklearn.ensemble import RandomForestClassifier
+     from sklearn import svm
+     from sklearn.svm import SVC
+     clf1 = XGBClassifier(learning_rate=0.01, max_depth=4, min_child_weight=6, gamma=0,reg_lambda=3,reg_alpha=0.2,eval_metric='auc',objective='binary:logistic', nthread=4)
+     clf2 = RandomForestClassifier(n_estimators=50, max_depth=1, min_samples_split=4, min_samples_leaf=54,
+                                        oob_score=True)
+     clf3 = SVC(C=10,gamma=0.1, probability=True)
+     #clf1 = LogisticRegression(random_state=1)
+     #clf2 = RandomForestClassifier(random_state=1)
+     #clf3 = GaussianNB()
+     x_train, x_test, y_train, y_test = train_test_split(
+         x, y, test_size=0.2, random_state=seed)
+
+     eclf1 = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='soft')
+     eclf1 = eclf1.fit(x_train, y_train)
+     result = eclf1.predict(x_test)
+     from sklearn.externals import joblib
+     joblib.dump(eclf1, '../model/611vote_svc_xgb_done.model')
+     metrics(result, y_test)
+     '''
+     除xgb外未调参
+     total:		 8104
+Accuracy:	 0.8086130306021717
+Precision:	 0.7949620801733478
+Recall:		 0.7870742826495039
+F1-score:	 0.7909985177199839
+xgb svc调参
+total:		 8104
+Accuracy:	 0.8094768015794669
+Precision:	 0.7920342154504143
+Recall:		 0.7945829981228212
+F1-score:	 0.7933065595716198
+'''
 
 
 if __name__ == '__main__':
@@ -484,6 +597,9 @@ if __name__ == '__main__':
     # cnn_metrics(x, y)
     # ada(x, y)
     # xgb(x, y)
-    lgb(x, y)
-    #lgb_gridsearch(x, y)
-    #xgb_gridsearch(x, y)
+    # lgb(x, y)
+    vote2(x, y)
+    #svc_gridsearch(x, y)
+    #rf_gridsearch(x, y)
+    # lgb_gridsearch(x, y)
+    # xgb_gridsearch(x, y)

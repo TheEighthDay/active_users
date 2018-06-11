@@ -15,6 +15,7 @@ import pandas as pd
 from tqdm import tqdm
 from util.vectorizer import vec
 from util.load_data import load_data
+from sklearn.ensemble import voting_classifier
 
 
 
@@ -58,7 +59,7 @@ def to_submission(model_name: str, model, x, ids):
     result = model.predict(x)
     ending = []
     for i in range(len(result)):
-        if result[i] >= 0.4:
+        if result[i] >= 0.45:
             ending.append(ids[i])
 
     timestamp = str(time.strftime('_%m_%d_%H_%M', time.localtime()))
@@ -73,6 +74,7 @@ def xgb_predict(fn):
     x, ids = gen_vec_data()
     x = xgb.DMatrix(x)
     to_submission('xgb', bst, x, ids)
+
 def lgb_predict(fn):
     from lightgbm.sklearn import LGBMClassifier
     from sklearn.externals import joblib
@@ -80,7 +82,15 @@ def lgb_predict(fn):
     x, ids = gen_vec_data()
     to_submission('lgb', bst, x, ids)
 
+def vote_predict(fn):
+    from lightgbm.sklearn import LGBMClassifier
+    from sklearn.externals import joblib
+    bst = joblib.load(fn)
+    x, ids = gen_vec_data()
+    to_submission('vote79_0.45', bst, x, ids)
+
 
 if __name__ == '__main__':
     #xgb_predict('../model/604xgb.model')
-    lgb_predict('../model/604lgb_after_gs.model')
+    #lgb_predict('../model/605lgb.model')
+    vote_predict('../model/611votef179.model')
