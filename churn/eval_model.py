@@ -500,14 +500,24 @@ def rf_gridsearch(x, y):
         x, y, test_size=0.2, random_state=seed)
     x = np.squeeze(x)
     y = np.squeeze(y)
-    param_test = {'n_estimators'[10,50,90]}
-    #param_test = {'max_depth': range(1, 5), 'min_samples_split': range(2, 10), 'min_samples_leaf': range(40, 60, 2)}
+    #param_test = {'n_estimators':[750,1500]}
+    #0.79336 1000
+    '''Best
+    score: 0.799
+    Best
+    parameters
+    set:
+    max_depth: 15
+    min_samples_leaf: 40
+    min_samples_split: 50'''
+
+    param_test = {'max_depth': [5,15,35,50,65], 'min_samples_split': [50,75,100,125,150], 'min_samples_leaf': [40,60,80,100,120,140,160,180]}
 
     estimator = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
             max_depth=None, max_features='auto', max_leaf_nodes=None,
             min_impurity_split=1e-07, min_samples_leaf=1,
             min_samples_split=2, min_weight_fraction_leaf=0.0,
-            n_estimators=10, n_jobs=1, oob_score=True, random_state=10,
+            n_estimators=1000, n_jobs=1, oob_score=True, random_state=10,
             verbose=0, warm_start=False)
     gsearch = GridSearchCV(estimator, param_grid=param_test, scoring='f1', cv=5)
     gsearch.fit(x, y)
@@ -553,7 +563,7 @@ def vote2(x, y):
      from sklearn import svm
      from sklearn.svm import SVC
      clf1 = XGBClassifier(learning_rate=0.01, max_depth=4, min_child_weight=6, gamma=0,reg_lambda=3,reg_alpha=0.2,eval_metric='auc',objective='binary:logistic', nthread=4)
-     clf2 = RandomForestClassifier(n_estimators=50, max_depth=1, min_samples_split=4, min_samples_leaf=54,
+     clf2 = RandomForestClassifier(n_estimators=50, max_depth=15, min_samples_split=45, min_samples_leaf=35,
                                         oob_score=True)
      clf3 = SVC(C=10,gamma=0.1, probability=True)
      #clf1 = LogisticRegression(random_state=1)
@@ -562,11 +572,11 @@ def vote2(x, y):
      x_train, x_test, y_train, y_test = train_test_split(
          x, y, test_size=0.2, random_state=seed)
 
-     eclf1 = VotingClassifier(estimators=[('lr', clf1), ('rf', clf2), ('gnb', clf3)], voting='soft')
+     eclf1 = VotingClassifier(estimators=[('xgb', clf1), ('rf', clf2), ('svc', clf3)], voting='soft')
      eclf1 = eclf1.fit(x_train, y_train)
      result = eclf1.predict(x_test)
      from sklearn.externals import joblib
-     joblib.dump(eclf1, '../model/611vote_svc_xgb_done.model')
+     joblib.dump(eclf1, '../model/611vote_svc_xgb_rf_done.model')
      metrics(result, y_test)
      '''
      除xgb外未调参

@@ -87,10 +87,10 @@ def vote_predict(fn):
     from sklearn.externals import joblib
     bst = joblib.load(fn)
     x, ids = gen_vec_data()
-    to_submission('vote79_0.45', bst, x, ids)
+    to_submission('vote80_0.45', bst, x, ids)
 
 
 if __name__ == '__main__':
     #xgb_predict('../model/604xgb.model')
     #lgb_predict('../model/605lgb.model')
-    vote_predict('../model/611votef179.model')
+    vote_predict('../model/611vote_svc_xgb_rf_done.model')
