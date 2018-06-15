@@ -90,7 +90,12 @@ def vote_predict(fn):
     to_submission('vote80_0.45', bst, x, ids)
 
 
+
 if __name__ == '__main__':
     #xgb_predict('../model/604xgb.model')
+
     #lgb_predict('../model/605lgb.model')
-    vote_predict('../model/611vote_svc_xgb_rf_done.model')
+    # vote_predict('../model/611vote_svc_xgb_rf_done.model')
+
+    xgb_predict('../model/605xgb.model')
+
