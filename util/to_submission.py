@@ -59,8 +59,15 @@ def to_submission(model_name: str, model, x, ids):
     """
     result = model.predict(x)
     ending = []
+    #result = sorted(result,reverse=True);
+    #for i in range(23800):
+        #ending.append(ids[i])
     for i in range(len(result)):
+<<<<<<< HEAD
         if result[i] >= 0.41:
+=======
+        if(result[i] >= 0.4):
+>>>>>>> 24f80f181121a4ad34ae322359ac8ee632e695ff
             ending.append(ids[i])
 
     timestamp = str(time.strftime('_%m_%d_%H_%M', time.localtime()))
@@ -88,17 +95,19 @@ def vote_predict(fn):
     from sklearn.externals import joblib
     bst = joblib.load(fn)
     x, ids = gen_vec_data()
-    to_submission('vote80_0.45', bst, x, ids)
-
+    to_submission('vote_lxf_0.4', bst, x, ids)
 
 
 if __name__ == '__main__':
     x, ids=gen_vec_data()
     print(ids)
     #xgb_predict('../model/604xgb.model')
-
     #lgb_predict('../model/605lgb.model')
+<<<<<<< HEAD
     # vote_predict('../model/611vote_svc_xgb_rf_done.model')
 
     # xgb_predict('../model/617xgb.model')
 
+=======
+    vote_predict('../model/614vote_lgb_xgb_rf_done.model')
+>>>>>>> 24f80f181121a4ad34ae322359ac8ee632e695ff

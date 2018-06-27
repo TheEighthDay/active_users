@@ -49,7 +49,7 @@ windows = [
 ]
 
 
-def metrics(result, y, threshold=0.45):
+def metrics(result, y, threshold=0.5):
     tp, tn, fp, fn = 0, 0, 0, 0
     for i in range(len(result)):
         if result[i] > threshold:
@@ -339,17 +339,19 @@ def xgb(x, y):
     # 31号晚params={'max_depth':4, 'eta':0.015, 'silent':0, 'objective':'binary:logistic', 'lambda': 4, 'alpha':0.5, 'eval_metric':'auc'}
     #params={'eta':0.01, 'n_estimators':140, 'max_depth':4, 'min_child_weight':4, 'gamma':0, 'subsample':0.6, 'colsample_bytree':0.7,'objective':'binary:logistic', 'nthread':4, 'eval_metric':'auc'}
 
+
     #5号晚0.4 params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.015, 'silent': 0, 'objective': 'binary:logistic',
     #         'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     #8号下午params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
     #          'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
-    params = {'max_depth': 7, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
-             'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
+    # params = {'max_depth': 7, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
+    #          'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
 
     watchlist = [(d_train, 'train')]
     bst = xgb.train(params, d_train, num_boost_round=400, evals=watchlist)
 
     result = bst.predict(d_test)
+
 
     bst.save_model('../model/617xgb.model')
 
@@ -571,23 +573,24 @@ def vote2(x, y):
      from sklearn.ensemble import RandomForestClassifier, VotingClassifier
      from xgboost.sklearn import XGBClassifier
      from sklearn.ensemble import RandomForestClassifier
+     from lightgbm.sklearn import LGBMClassifier
      from sklearn import svm
      from sklearn.svm import SVC
      clf1 = XGBClassifier(learning_rate=0.01, max_depth=4, min_child_weight=6, gamma=0,reg_lambda=3,reg_alpha=0.2,eval_metric='auc',objective='binary:logistic', nthread=4)
-     clf2 = RandomForestClassifier(n_estimators=50, max_depth=15, min_samples_split=45, min_samples_leaf=35,
-                                        oob_score=True)
-     clf3 = SVC(C=10,gamma=0.1, probability=True)
+     clf2 = RandomForestClassifier(n_estimators=50, max_depth=15, min_samples_split=45, min_samples_leaf=35,oob_score=True)
+     clf3 = LGBMClassifier(num_leaves=4,learning_rate=0.01,n_estimators=185,min_child_weight=5,subsample=0.7,colsample_bytree=0.6)
+     #clf3 = SVC(C=10,gamma=0.1, probability=True)
      #clf1 = LogisticRegression(random_state=1)
      #clf2 = RandomForestClassifier(random_state=1)
      #clf3 = GaussianNB()
      x_train, x_test, y_train, y_test = train_test_split(
          x, y, test_size=0.2, random_state=seed)
 
-     eclf1 = VotingClassifier(estimators=[('xgb', clf1), ('rf', clf2), ('svc', clf3)], voting='soft')
+     eclf1 = VotingClassifier(estimators=[('xgb', clf1), ('rf', clf2), ('lgb', clf3)], voting='soft')
      eclf1 = eclf1.fit(x_train, y_train)
      result = eclf1.predict(x_test)
      from sklearn.externals import joblib
-     joblib.dump(eclf1, '../model/611vote_svc_xgb_rf_done.model')
+     joblib.dump(eclf1, '../model/614vote_lgb_xgb_rf_done.model')
      metrics(result, y_test)
      '''
      除xgb外未调参
@@ -602,6 +605,14 @@ Accuracy:	 0.8094768015794669
 Precision:	 0.7920342154504143
 Recall:		 0.7945829981228212
 F1-score:	 0.7933065595716198
+'''
+'''
+ xgb lgb sf
+total: 8104
+Accuracy: 0.8219397828232972
+Precision: 0.8198097369893677
+Recall: 0.7857334406006973
+F1 - score: 0.8035099685060934
 '''
 
 
