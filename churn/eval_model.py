@@ -7,7 +7,8 @@
 # @Desc  :
 # @Contact : huiwenbin199822@gmail.com
 # @Software : PyCharm
-
+import sys
+sys.path.append("../")
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor, ExtraTreesRegressor, GradientBoostingRegressor
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.neighbors import KNeighborsRegressor
@@ -22,8 +23,8 @@ from sklearn.grid_search import GridSearchCV
 from preprocess import load_preprocessed, load_preprocessed_data_23_7
 import scipy as sp
 import copy, os, sys, psutil
-import lightgbm as lgb
-from lightgbm.sklearn import LGBMClassifier
+# import lightgbm as lgb
+# from lightgbm.sklearn import LGBMClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import dump_svmlight_file
 import numpy as np
@@ -342,7 +343,7 @@ def xgb(x, y):
     #         'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
     #8号下午params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
     #          'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
-    params = {'max_depth': 6, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
+    params = {'max_depth': 7, 'min_child_weight': 4, 'eta': 0.01, 'silent': 0, 'objective': 'binary:logistic','gamma':1,
              'lambda': 3, 'alpha': 0.2, 'eval_metric': 'auc'}
 
     watchlist = [(d_train, 'train')]
@@ -350,7 +351,7 @@ def xgb(x, y):
 
     result = bst.predict(d_test)
 
-    bst.save_model('../model/604xgb.model')
+    bst.save_model('../model/617xgb.model')
 
     print(result)
     print(y_test)
@@ -616,9 +617,9 @@ if __name__ == '__main__':
     # cnn(x, y)
     # cnn_metrics(x, y)
     # ada(x, y)
-    # xgb(x, y)
+    xgb(x, y)
     # lgb(x, y)
-    vote2(x, y)
+    # vote2(x, y)
     #svc_gridsearch(x, y)
     #rf_gridsearch(x, y)
     # lgb_gridsearch(x, y)

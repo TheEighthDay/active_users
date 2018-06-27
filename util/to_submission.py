@@ -7,7 +7,8 @@
 # @Desc  : 
 # @Contact : huiwenbin199822@gmail.com 
 # @Software : PyCharm
-
+import sys
+sys.path.append("../")
 import os
 import time
 import numpy as np
@@ -20,9 +21,9 @@ from sklearn.ensemble import voting_classifier
 
 
 def gen_vec_data():
-    if os.path.exists('../original_data/x_30.npy'):
-        x = np.load('../original_data/x_30.npy')
-        ids = np.load('../original_data/id_30.npy')
+    if os.path.exists('../original_data/B/x_30.npy'):
+        x = np.load('../original_data/B/x_30.npy')
+        ids = np.load('../original_data/B/id_30.npy')
         print(np.shape(x))
         return x, ids
     else:
@@ -41,8 +42,8 @@ def gen_vec_data():
             x.append(v)
         x = np.array(x)
         ids = r['user_id'].get_values()
-        np.save('../original_data/x_30', x)
-        np.save('../original_data/id_30', ids)
+        np.save('../original_data/B/x_30', x)
+        np.save('../original_data/B/id_30', ids)
         print(np.shape(x))
         return x, ids
 
@@ -59,7 +60,7 @@ def to_submission(model_name: str, model, x, ids):
     result = model.predict(x)
     ending = []
     for i in range(len(result)):
-        if result[i] >= 0.45:
+        if result[i] >= 0.41:
             ending.append(ids[i])
 
     timestamp = str(time.strftime('_%m_%d_%H_%M', time.localtime()))
@@ -92,10 +93,12 @@ def vote_predict(fn):
 
 
 if __name__ == '__main__':
+    x, ids=gen_vec_data()
+    print(ids)
     #xgb_predict('../model/604xgb.model')
 
     #lgb_predict('../model/605lgb.model')
     # vote_predict('../model/611vote_svc_xgb_rf_done.model')
 
-    xgb_predict('../model/605xgb.model')
+    # xgb_predict('../model/617xgb.model')
 
