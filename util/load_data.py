@@ -18,7 +18,7 @@ def o_data_2_csv_app_launch_log():
     """
     user_id = []
     day = []
-    with open('../original_data/app_launch_log.txt', 'r', encoding='utf8') as fp:
+    with open('../original_data/B/app_launch_log.txt', 'r', encoding='utf8') as fp:
         for l in tqdm.tqdm(fp.readlines()):
             l = l.split('\t')
             user_id.append(int(l[0]))
@@ -28,7 +28,7 @@ def o_data_2_csv_app_launch_log():
 
     # 用concat方式连接后存储，使得列的顺序不变
     con = pd.concat([col_user_id, col_day], axis=1)
-    con.to_csv('../original_data/app_launch_log.csv', index=False, sep=' ')
+    con.to_csv('../original_data/B/app_launch_log.csv', index=False, sep=' ')
 
 
 def o_data_2_csv_user_activity_log():
@@ -40,7 +40,7 @@ def o_data_2_csv_user_activity_log():
     action_type = []
     cnt = 0
     num = 1
-    with open('../original_data/user_activity_log.txt', 'r', encoding='utf8') as fp:
+    with open('../original_data/B/user_activity_log.txt', 'r', encoding='utf8') as fp:
         for l in tqdm.tqdm(fp.readlines()):
             cnt += 1
 
@@ -60,7 +60,7 @@ def o_data_2_csv_user_activity_log():
                 col_author_id = pd.Series(author_id, name='author_id')
                 col_action_type = pd.Series(action_type, name='action_type')
                 con = pd.concat([col_user_id, col_day, col_page, col_video_id, col_author_id, col_action_type], axis=1)
-                con.to_csv('../original_data/user_activity_log' + str(num) + '.csv', index=False, sep=' ')
+                con.to_csv('../original_data/B/user_activity_log' + str(num) + '.csv', index=False, sep=' ')
                 user_id.clear()
                 day.clear()
                 page.clear()
@@ -77,7 +77,7 @@ def o_data_2_csv_user_activity_log():
     col_author_id = pd.Series(author_id, name='author_id')
     col_action_type = pd.Series(action_type, name='action_type')
     con = pd.concat([col_user_id, col_day, col_page, col_video_id, col_author_id, col_action_type], axis=1)
-    con.to_csv('../original_data/user_activity_log' + str(num) + '.csv', index=False, sep=' ')
+    con.to_csv('../original_data/B/user_activity_log' + str(num) + '.csv', index=False, sep=' ')
 
 
 def o_data_2_csv_user_register_log():
@@ -85,7 +85,7 @@ def o_data_2_csv_user_register_log():
     register_day = []
     register_type = []
     device_type = []
-    with open('../original_data/user_register_log.txt', 'r', encoding='utf8') as fp:
+    with open('../original_data/B/user_register_log.txt', 'r', encoding='utf8') as fp:
         for l in tqdm.tqdm(fp.readlines()):
             l = l.split('\t')
             user_id.append(int(l[0]))
@@ -97,13 +97,13 @@ def o_data_2_csv_user_register_log():
     col_register_type = pd.Series(register_type, name='register_type')
     col_device_type = pd.Series(device_type, name='device_type')
     con = pd.concat([col_user_id, col_register_day, col_register_type, col_device_type], axis=1)
-    con.to_csv('../original_data/user_register_log.csv', index=False, sep=' ')
+    con.to_csv('../original_data/B/user_register_log.csv', index=False, sep=' ')
 
 
 def o_data_2_csv_video_create_log():
     user_id = []
     day = []
-    with open('../original_data/video_create_log.txt', 'r', encoding='utf8') as fp:
+    with open('../original_data/B/video_create_log.txt', 'r', encoding='utf8') as fp:
         for l in tqdm.tqdm(fp.readlines()):
             l = l.split('\t')
             user_id.append(int(l[0]))
@@ -111,7 +111,7 @@ def o_data_2_csv_video_create_log():
     col_user_id = pd.Series(user_id, name='user_id')
     col_day = pd.Series(day, name='day')
     con = pd.concat([col_user_id, col_day], axis=1)
-    con.to_csv('../original_data/video_create_log.csv', index=False, sep=' ')
+    con.to_csv('../original_data/B/video_create_log.csv', index=False, sep=' ')
 
 
 def load_data():
@@ -119,21 +119,21 @@ def load_data():
 
     :return: r, l, c, a
     """
-    app_launch_log = pd.DataFrame(pd.read_csv('../original_data/app_launch_log.csv', sep=' '))
-    user_activity_log1 = pd.read_csv('../original_data/user_activity_log1.csv', sep=' ')
-    user_activity_log2 = pd.read_csv('../original_data/user_activity_log2.csv', sep=' ')
-    user_activity_log3 = pd.read_csv('../original_data/user_activity_log3.csv', sep=' ')
-    user_activity_log4 = pd.read_csv('../original_data/user_activity_log4.csv', sep=' ')
-    user_activity_log5 = pd.read_csv('../original_data/user_activity_log5.csv', sep=' ')
-    user_activity_log6 = pd.read_csv('../original_data/user_activity_log6.csv', sep=' ')
+    app_launch_log = pd.DataFrame(pd.read_csv('../original_data/B/app_launch_log.csv', sep=' '))
+    user_activity_log1 = pd.read_csv('../original_data/B/user_activity_log1.csv', sep=' ')
+    user_activity_log2 = pd.read_csv('../original_data/B/user_activity_log2.csv', sep=' ')
+    user_activity_log3 = pd.read_csv('../original_data/B/user_activity_log3.csv', sep=' ')
+    user_activity_log4 = pd.read_csv('../original_data/B/user_activity_log4.csv', sep=' ')
+    user_activity_log5 = pd.read_csv('../original_data/B/user_activity_log5.csv', sep=' ')
+    user_activity_log6 = pd.read_csv('../original_data/B/user_activity_log6.csv', sep=' ')
     user_activity_log = pd.DataFrame(pd.concat([user_activity_log1,
                                   user_activity_log2,
                                   user_activity_log3,
                                   user_activity_log4,
                                   user_activity_log5,
                                   user_activity_log6]))
-    user_register_log = pd.DataFrame(pd.read_csv('../original_data/user_register_log.csv', sep=' '))
-    video_create_log = pd.DataFrame(pd.read_csv('../original_data/video_create_log.csv', sep=' '))
+    user_register_log = pd.DataFrame(pd.read_csv('../original_data/B/user_register_log.csv', sep=' '))
+    video_create_log = pd.DataFrame(pd.read_csv('../original_data/B/video_create_log.csv', sep=' '))
 
     return user_register_log, app_launch_log, video_create_log, user_activity_log
 
@@ -150,4 +150,4 @@ if __name__ == '__main__':
     print(r.keys())
     print(c.keys())
 
-    pass
+   

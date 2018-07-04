@@ -10,7 +10,7 @@
 
 
 import numpy as np
-from active_users.util.load_data import load_data
+from util.load_data import load_data
 
 
 def vec(r: list, l: list, c: list, a: list, author_id: list, now):
